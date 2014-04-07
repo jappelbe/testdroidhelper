@@ -18,10 +18,17 @@ Or install it yourself as:
 
 ## Expected usage (simplified):
 ```ruby
-td_provider = TestdroidHelper::RemoteCOnnectionProvider.new
+USERNAME = "username"
+PASSWORD = "password"
+PROJECT_NAME = "testdroid_project"
+TEST_APP_PATH = "/tmp/testapp.apk"
+CONCURRENCY = 5 # target_concurrency should be smaller than thread count
+THREAD_COUNT = 10
+
+td_provider = TestdroidHelper::RemoteConnectionProvider.new(USERNAME, PASSWORD)
 device_ids = td_provider.get_devices_array.map {|dev| dev.first}
-td_provider.setup_test # target_concurrency should be smaller than thread count
-1.upto(YOUR_THREAD_COUNT) do |i|
+td_provider.setup_test(PROJECT_NAME, TEST_APP_PATH, device_ids, CONCURRENCY)
+1.upto(THREAD_COUNT) do
   device_id = device_ids.pop
   remote = td_provider.get_device(device_id)
   # Do remote stuff here
