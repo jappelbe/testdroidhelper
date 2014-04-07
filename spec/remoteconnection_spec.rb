@@ -6,7 +6,7 @@ describe TestdroidHelper::RemoteConnection do
     username = "str_username"
     password = "str_passwd"
     Testdroid::Cloud::Client.stub(:new)
-    Testdroid::Cloud::Client.should_receive(:new).with(username, password, TD_HOST, TD_USERS_HOST).and_call_original
+    Testdroid::Cloud::Client.should_receive(:new).with(username, password, TestdroidHelper::TD_HOST, TestdroidHelper::TD_USERS_HOST).and_call_original
     Testdroid::Cloud::Client.any_instance.stub(:get_user).and_return("User")
     @remote_connection = TestdroidHelper::RemoteConnection.new username, password
   end
