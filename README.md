@@ -17,7 +17,7 @@ Or install it yourself as:
     $ gem install testdroidhelper
 
 ## Expected usage (simplified):
-
+```ruby
 td_provider = TestdroidHelper::RemoteCOnnectionProvider.new
 device_ids = td_provider.get_devices_array.map {|dev| dev.first}
 td_provider.setup_test # target_concurrency should be smaller than thread count
@@ -27,7 +27,7 @@ td_provider.setup_test # target_concurrency should be smaller than thread count
   # Do remote stuff here
   remote.get_screenshot
 end
-
+```
 ## Contributing
 
 1. Fork it ( http://github.com/jappelbe/testdroidhelper/fork )
