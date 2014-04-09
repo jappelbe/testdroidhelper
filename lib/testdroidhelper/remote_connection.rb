@@ -58,18 +58,22 @@ module TestdroidHelper
           begin
             remote = Testdroid::Cloud::Remote.new(stomp_hash)
             remote.open
+            @td_logger.debug "TestdroidHelper::RemoteConnection.connect_to_device wait until project is running"
+            sleep(10) until  @project.runs.get(project_run.id).group_state == 'RUNNING' || @project.runs.get(project_run.id).group_state == 'FINISHED'
             device_runs = @project.runs.get(project_run.id).device_runs.list
-            @td_logger.debug "TestdroidHelper::RemoteConnection.connect_to_device '#{device_id}': device_runs=#{device_runs}. "
-            requested_devices = device_runs.select {|dev| dev.device_id == device_id}
+            @td_logger.warn "TestdroidHelper::RemoteConnection.connect_to_device project run started with more than one device - device runs: #{device_runs.size}" unless device_runs.size == 1
+            @td_logger.debug "TestdroidHelper::RemoteConnection.connect_to_device '#{device_id}': device_runs=#{device_runs}. Run id: #{project_run.id}"
+            requested_devices = device_runs.select {|dev| dev.device_id == device_id.to_i}
             requested_device = requested_devices.first
+            @td_logger.debug "TestdroidHelper::RemoteConnection.connect_to_device device:'#{device_id}' state: #{requested_device.group_state}" unless requested_device.nil?
           rescue TimeoutError => e
             raise TimeoutError.new("Timeout while opening remote to device '#{device_id}': #{e}")
           end
         end
       end
       raise StandardError.new('No device could be selected') unless requested_device
-      success = remote.wait_for_connection(project_run.id, requested_device.id)
-      return nil unless success
+      remote.wait_for_connection(project_run.id, requested_device.id)
+
       remote
     end
 
