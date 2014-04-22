@@ -45,6 +45,7 @@ module TestdroidHelper
     def connect_to_device(project_run, device_id, timeout=TestdroidHelper::TD_DEFAULT_TIMEOUT)
       remote = nil
       requested_device = nil
+
       connection_hash = {login: @username,
                          passcode: @password,
                          host: TestdroidHelper::TD_HOST,
@@ -71,8 +72,8 @@ module TestdroidHelper
         end
       end
       raise StandardError.new('No device could be selected') unless requested_device
+      raise StandardError.new('Device is excluded or test run is canceled') if requested_device.group_state == 'FINISHED' 
       remote.wait_for_connection(project_run.id, requested_device.id)
-
       remote
     end
 
