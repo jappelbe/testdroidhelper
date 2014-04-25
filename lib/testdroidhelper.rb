@@ -23,3 +23,4 @@ end
 
 require 'testdroidhelper/remote_connection.rb'
 require 'testdroidhelper/remote_connection_provider.rb'
+require 'testdroidhelper/stderr_redirect.rb'

@@ -8,11 +8,16 @@ module TestdroidHelper
       @username = username
       @password = password
       @td_logger = logger
+
+      # stomp outputs to stderr, we'd rather have that in file
+      stomp_filter = /connection.receive returning EOF as nil.*resetting connection/
+      $stderr = StderrRedirect.new(nil, stomp_filter)
+
       @cloud = Testdroid::Cloud::Client.new(@username, @password, TestdroidHelper::TD_HOST, TestdroidHelper::TD_USERS_HOST)
 
       @user = @cloud.get_user
       raise StandardError.new("Couldn't login with as user '#{@username}'") unless @user
-      @connect_mutex = Mutex.new
+      @connect_mutexes = {}
     end
 
     def setup_project(project_name)
@@ -25,6 +30,7 @@ module TestdroidHelper
     # @return [TestdroidAPI::Run] project_run
     def start_run(devices_array, timeout = nil)
       raise StandardError.new('Project has not been setup yet, call .setup_project') unless @project
+      raise StandardError.new("Empty array provided, will not start") if devices_array.empty?
       project_run = nil
       begin
         csv_devices_list = nil
@@ -54,13 +60,16 @@ module TestdroidHelper
       stomp_hash = {hosts: [connection_hash],
                     parse_timeout: 150,
                     logger: @td_logger}
-      @connect_mutex.synchronize do
+
+      # Connection mutex is project-run specific
+      @connect_mutexes[project_run.id] ||= Mutex.new
+      @connect_mutexes[project_run.id].synchronize do
         Timeout.timeout(timeout) do
           begin
             remote = Testdroid::Cloud::Remote.new(stomp_hash)
             remote.open
             @td_logger.debug "TestdroidHelper::RemoteConnection.connect_to_device wait until project is running"
-            sleep(10) until  @project.runs.get(project_run.id).group_state == 'RUNNING' || @project.runs.get(project_run.id).group_state == 'FINISHED'
+            sleep(5) until  @project.runs.get(project_run.id).group_state == 'RUNNING' || @project.runs.get(project_run.id).group_state == 'FINISHED'
             device_runs = @project.runs.get(project_run.id).device_runs.list
             @td_logger.warn "TestdroidHelper::RemoteConnection.connect_to_device project run started with more than one device - device runs: #{device_runs.size}" unless device_runs.size == 1
             requested_devices = device_runs.select {|dev| dev.device_id == device_id.to_i}

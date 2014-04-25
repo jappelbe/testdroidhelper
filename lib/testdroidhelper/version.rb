@@ -1,3 +1,3 @@
 module Testdroidhelper
-  VERSION = "0.0.6"
+  VERSION = "0.0.8"
 end

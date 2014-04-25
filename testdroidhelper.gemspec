@@ -22,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec"
 
+  spec.add_runtime_dependency "stomp", "1.2.9"
   spec.add_runtime_dependency "testdroid-cloud"
   spec.add_runtime_dependency "testdroid-cloud-remote"
   spec.add_runtime_dependency "testdroid-api-client"
