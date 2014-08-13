@@ -1,0 +1,9 @@
+source "http://rubygems.org"
+gem "rest-client"
+
+gem "stomp", "1.2.9"
+gem "testdroid-cloud", :git => 'https://github.com/srautiai/testdroid-cloud-client-ruby'
+gem "testdroid-cloud-remote", :git => 'https://github.com/srautiai/testdroid-cloud-remote-ruby'
+gem "testdroid-api-client", :git => 'https://github.com/bitbar/testdroid-api-client-ruby.git'
+gem "testdroidhelper", :git => "https://github.com/jappelbe/testdroidhelper.git"
+
