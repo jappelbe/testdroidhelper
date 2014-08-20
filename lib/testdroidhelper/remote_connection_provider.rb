@@ -16,6 +16,10 @@ module TestdroidHelper
     # @param [Fixnum] target_concurrency (optional)
     def setup_test(project_name, test_app_path, selected_devices, target_concurrency=TestdroidHelper::TD_DEFAULT_TARGET)
       @target = target_concurrency
+      if selected_devices.count < target_concurrency
+        @logger.warn "Target concurrency(#{target_concurrency}) is larger than device count (#{selected_devices.count}), adjusting concurrency"
+        @target = selected_devices.count
+      end
       @devices_to_go = Set.new(selected_devices)
       @devices_waiting = Queue.new
       @project_dev_id = {}
@@ -52,7 +56,7 @@ module TestdroidHelper
           project_run = @remote_connect.start_run(device_array)
         rescue Exception => e
           @logger.warn "TestdroidHelper::RemoteConnectionProvider.get_device(#{device_id.inspect}): Couldn't start project_run: #{e}"
-          @logger.warn "backtrace: #{e}"
+          @logger.warn "at: #{e.backtrace.first}"
           puts "***** COULD NOT START PROJECT RUN! CHECK LOGS!"
           unless retried_already
             @logger.warn "retrying once"
@@ -100,6 +104,10 @@ module TestdroidHelper
     end
 
     def execute_on_all_devices(thread_count)
+      if thread_count < @target
+        @logger.warn "desired thread_count (#{thread_count}) is set to larger than concurrency target(#{@target}). Adjusting thread_count"
+        thread_count = @target
+      end
       device_ids = Queue.new
       @devices_to_go.to_a.shuffle.each { |dev| device_ids << dev }
 
