@@ -5,7 +5,7 @@ require 'thread'
 
 original_verbosity = $VERBOSE
 $VERBOSE = nil
-require 'testdroid-cloud'
+require 'testdroid-api-client'
 require 'testdroid-cloud-remote'
 $VERBOSE = original_verbosity
 

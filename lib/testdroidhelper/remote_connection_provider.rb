@@ -83,19 +83,19 @@ module TestdroidHelper
 
     def get_devices_array(filter_include=/.*/i, filter_exclude=nil)
       devices = @remote_connect.get_devices
-      devices.select! {|dev| dev.user_name.match(filter_include)}
-      devices.select! {|dev| dev.user_name.match(filter_exclude) ? false : true } if filter_exclude
-      devices.map! { |dev| [dev.id, dev.user_name, dev.serial_id] }
+      devices.select! {|dev| dev.display_name.match(filter_include)}
+      devices.select! {|dev| dev.display_name.match(filter_exclude) ? false : true } if filter_exclude
+      devices.map! { |dev| [dev.id, dev.display_name, dev.os_type] }
       devices
     end
 
     def get_device_name(device_id)
       device = @remote_connect.get_devices.select { |dev| dev.id.to_i == device_id.to_i }.first
-      device.user_name
+      device.display_name
     end
 
     def get_devices_string
-      @remote_connect.get_devices.map { |dev| "#{dev.user_name} ID: #{dev.id} serialId: #{dev.serial_id}" }.join("\n")
+      @remote_connect.get_devices.map { |dev| "#{dev.display_name} ID: #{dev.id} os type: #{dev.serial_id}" }.join("\n")
     end
 
     def get_project_names
