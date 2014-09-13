@@ -45,12 +45,15 @@ module TestdroidHelper
         break unless @devices_to_go.size > 0
         break unless (@devices_waiting.size >= @target or @devices_to_go.size == @devices_waiting)
         devices_to_run_here_count = [@devices_waiting.size, @devices_to_go.size, @target].min
+        
         device_array = []
         devices_to_run_here_count.times do
           device_to_run = @devices_waiting.pop
-          device_array << device_to_run
+          device_array << device_to_run if device_to_run
           @devices_to_go.delete(device_to_run)
+
         end
+        
         retried_already = false
         begin
           project_run = @remote_connect.start_run(device_array)
@@ -59,6 +62,7 @@ module TestdroidHelper
           @logger.warn "at: #{e.backtrace.first}"
           puts "***** COULD NOT START PROJECT RUN! CHECK LOGS!"
           unless retried_already
+            retried_already = true
             @logger.warn "retrying once"
             retry
           end
@@ -69,6 +73,7 @@ module TestdroidHelper
         end
       }
       current_project_run = @project_dev_id[device_id].pop
+      return nil if current_project_run.nil?
       @device_statuses[device_id] = :project_run_started
       this_remote = nil
       begin
